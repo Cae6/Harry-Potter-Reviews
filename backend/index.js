@@ -2,7 +2,8 @@
 import app from './server.js'
 import mongodb from "mongodb"
 import dotenv from "dotenv"
-import HpotterDAO from './dao/HpotterDAO.js'
+import HpottersDAO from './dao/HpottersDAO.js'
+import AnalysisDAO from './dao/analysisDAO.js'
 
 
 
@@ -10,13 +11,14 @@ async function main() {
 
   dotenv.config()
 
-  const client = new mongodb.MongoClient( process.env.HPOTTER_DB_URI)
+  const client = new mongodb.MongoClient(process.env.HPOTTER_DB_URI)
 
   const port = process.env.PORT || 8000
 
   try {
     await client.connect()
-    await HpotterDAO.injectDB(client)
+    await HpottersDAO.injectDB(client)
+    await AnalysisDAO.injectDB(client)
    
 
     app.listen(port, () => {
