@@ -1,8 +1,10 @@
 
 
+
+import mongodb from 'mongodb';
+const ObjectId = mongodb.ObjectId;
+
 let Hpotters;
-
-
 export default class HpottersDAO {
   static async injectDB(conn) {
     if (Hpotters) {
@@ -20,18 +22,14 @@ export default class HpottersDAO {
     page = 0,
     HpottersPerPage = 20,
   } = {}) {
-    let query
+    let query 
     
    
     if (filters) {
       if ("name" in filters) {
-        query = {  $text: {$search: filters['name'] } }; 
-      }
-      if ("house" in filters) {
-        query.house = { $eq: filters['house'] };
-      }
-      if ("actor" in filters) {
-        query.actor = { $eq: filters['actor'] };
+        query = { $text: { $search: filters['name'] } };
+      } else if ("species" in filters) {
+        query = { species: { $eq: filters['species'] } };
       }
     }
 
@@ -45,10 +43,46 @@ export default class HpottersDAO {
       const HpottersList = await cursor.toArray();
       const totalNumHpotters = await Hpotters.countDocuments(query);
 
-      return { HpottersList, totalNumHpotters };
+      return { HpottersList, totalNumHpotters }; 
     } catch (e) {
       console.error(`Unable to issue find command, ${e}`);
       return { HpottersList: [], totalNumHpotters: 0 };
     }
   }
-}
+
+  static async getSpecies() {
+    try{
+      return await Hpotters.distinct("species");
+    } catch (e) {
+      console.error(`Unable to get species, ${e}`);
+      return [];
+    }
+    }
+
+    static async getHpotterByID(id) {
+      try {
+        return await Hpotters.aggregate([
+          { $match: {
+            _id: ObjectId.createFromHexString(id),
+          }},
+          { $lookup: {
+            from: 'analysis',
+            localField: '_id',
+            foreignField: 'Hpotters_id',
+            as: 'analysis'    
+          }
+          }
+        ]).next();
+        
+      }
+      catch (e) {
+        console.error(`Something went wrong in getHpotterByID: ${e}`);
+        throw e;
+      }
+}}
+
+//Chizorom Ekweghariri
+//4/28/25
+// IT302-452
+//cae6@njit.edu
+//IT-302 Phase 5

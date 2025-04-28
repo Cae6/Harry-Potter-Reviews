@@ -6,7 +6,10 @@ const router = express.Router();
 
 
 router.route('/').get(HpottersController.apiGetHpotters);
+router.route('/id/:id').get(HpottersController.apiGetHpotterById);
+router.route('/species').get(HpottersController.apiGetSpecies);
 router.route('/analysis')
+
 .post(AnalysisController.apiPostAnalysis)
 .put(AnalysisController.apiUpdateAnalysis)
 .delete(AnalysisController.apiDeleteAnalysis);
@@ -16,7 +19,7 @@ router.route('/analysis')
 export default router;
  
 //Chizorom Ekweghariri
-//3/24/25
+//4/28/25
 // IT302-452
 //cae6@njit.edu
-//IT-302 Phase 3
+//IT-302 Phase 5
